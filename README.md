@@ -1,4 +1,4 @@
-# Introduction-to-Causal-Inference
+# Introduction to Causal Inference
 
 ## Introduction
 
