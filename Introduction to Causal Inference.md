@@ -1,10 +1,12 @@
 # Introduction to Causal Inference
 
-This is a brief note on [Brady Neal]([Brady Neal - About Me](https://www.bradyneal.com/aboutme))'s online causal inference course. Contents are arranged by the course textbook. Some sections are slightly modified according to my personal comprehension to help understanding. *Last update on July 31th, 2022.*
+This is a brief note on [Brady Neal](https://www.bradyneal.com/aboutme)'s online causal inference course. Contents are arranged by the course textbook. Some sections are slightly modified according to my personal comprehension to help understanding. *Last update on August 1st, 2022.*
 
 **Course Website：** [Introduction to Causal Inference (bradyneal.com)](https://www.bradyneal.com/causal-inference-course)
 
 **Textbook：** [Introduction_to_Causal_Inference-Dec17_2020-Neal](https://www.bradyneal.com/Introduction_to_Causal_Inference-Dec17_2020-Neal.pdf)
+
+
 
 
 
@@ -18,23 +20,25 @@ This is a brief note on [Brady Neal]([Brady Neal - About Me](https://www.bradyne
 
 
 
+
+
 ## 2 Potential Outcomes
 
 ### Fundamental Concepts
 
-Observed Outcome:
+**Observed Outcome:**
 $$
 Y
 $$
-Potential Outcome: 
+**Potential Outcome:** 
 $$
 Y(t)
 $$
-Individual Treatment Effect (ITE) / Individual Causal Effect (ICE): 
+**Individual Treatment Effect (ITE) / Individual Causal Effect (ICE):** 
 $$
 \tau_i=Y_i(1)-Y_i(0)
 $$
-Average Treatment Effect (ATE) / Average Causal Effect (ACE): 
+**Average Treatment Effect (ATE) / Average Causal Effect (ACE):** 
 $$
 \begin{aligned}
 \tau&=\mathbb{E}\big[Y_i(1)-Y_i(0)\big]\\
@@ -42,11 +46,11 @@ $$
 &=\mathbb{E}\big[Y(1)\big]-\mathbb{E}\big[Y(0)\big]
 \end{aligned}
 $$
-Associational Difference:
-
+**Associational Difference:**
 $$
 \mathbb{E}\big[Y|T=1\big]-\mathbb{E}\big[Y|T=0\big]
 $$
+
 
 
 ### Fundamental Problem of Causal Inference
@@ -177,6 +181,106 @@ A combination of consistency and no interference.
 #### Causal Estimand & Statistical Estimand
 
 <img src="figs\2.5.png" style="zoom:70%;" />
+
+
+
+
+
+## 3 The Flow of Association and Causation in Graphs
+
+### Bayesian Networks
+
+#### Basic Assumptions
+
+**Local Markov Assumption:** 
+
+- Given its parents in the DAG (Directed Acyclic Graph), a node $X$ is independent of all its non-descendants.
+
+With local Markov assumption, we can simplify the factor:
+
+<img src="figs\3.6.png" style="zoom:50%;" />
+$$
+\begin{aligned}
+P(x_1.x_2,x_3,x_4)&=P(x_1)P(x_2|x_1)P(x_3|x_2,x_1)P(x_4|x_3,x_2,x_1)\\
+&=P(x_1)P(x_2|x_1)P(x_3|x_2,x_1)P(x_4|x_3)
+\end{aligned}
+$$
+**Minimality Assumption:** 
+
+1. Given its parents in the DAG, a node $X$ is independent of all its non-descendants. **(Local Markov Assumption)**
+2. Adjacent nodes in the DAG are dependent.
+
+The minimality assumption gives an additional constraint on the direction of independence.
+
+<img src="figs\3.8.png" style="zoom:50%;" />
+$$
+\begin{aligned}
+P(x,y)&=P(x)P(y|x)\\
+&\ne P(y)P(x|y)
+\end{aligned}
+$$
+
+#### Basic Blocks
+
+We will study the association from three basic blocks in Bayesian networks.
+
+<img src="figs\3.9.png" style="zoom:55%;" />
+
+|                         Basic Block                          |             Association ($X_1$ and $X_3$)             |                            Proof                             |
+| :----------------------------------------------------------: | :---------------------------------------------------: | :----------------------------------------------------------: |
+|   <img src="figs\3.12.png" style="zoom:50%;" /><br/>Chain    |                       Dependent                       |                            ——————                            |
+| <img src="figs\3.14.png" style="zoom:50%;" /><br />Conditioned Chain |            ***Conditionally Independent***            | $\begin{aligned}P(x_1,x_3|x_2)&=\dfrac{P(x_1,x_2,x_3)}{P(x_2)}\\&=\dfrac{P(x_1)P(x_2|x_1)P(x_3|x_2)}{P(x_2)}\\&=\dfrac{P(x_1,x_2)P(x_3|x_2)}{P(x_2)}\\&=P(x_1|x_2)P(x_3|x_2)\end{aligned}$ |
+|   <img src="figs\3.13.png" style="zoom:50%;" /><br />Fork    |                       Dependent                       |                            ——————                            |
+| <img src="figs\3.15.png" style="zoom:50%;" /><br />Conditioned Fork |            ***Conditionally Independent***            | $\begin{aligned}P(x_1,x_3|x_2)&=\dfrac{P(x_1,x_2,x_3)}{P(x_2)}\\&=\dfrac{P(x_1|x_2)P(x_2)P(x_3|x_2)}{P(x_2)}\\&=P(x_1|x_2)P(x_3|x_2)\end{aligned}$ |
+| <img src="figs\3.16.png" style="zoom:50%;" /><br />Immorality | ***Independent***<br />($X_2$ is called the collider) | $\begin{aligned}P(x_1,x_3)&=\sum_{x_2}P(x_1,x_2,x_3)\\&=\sum_{x_2}P(x_1)P(x_3)P(x_2|x_1,x_3)\\&=P(x_1)P(x_3)\sum_{x_2}P(x_2|x_1,x_3)\\&=P(x_1)P(x_3)\end{aligned}$ |
+| <img src="figs\3.17.png" style="zoom:50%;" /><br />Conditioned Immorality |                Conditionally Dependent                |                            ——————                            |
+
+#### D-separation & Markov Assumption
+
+**Blocked Path:** A path $X\rightarrow\dots\rightarrow Y$ is blocked by a conditioning set $Z$ (can be empty) if either of the following is true:
+
+1. Along the path, there is a chain $\dots\rightarrow W\rightarrow\dots$ or a fork $\dots\leftarrow W\rightarrow\dots$ , where  $W\in Z$.
+
+2. Along the path, there is a collider $\dots\rightarrow W\leftarrow\dots$ , where $W,\text{de}(W)\notin Z$,
+
+   in which $\text{de}(\cdot)$ means descendants.
+
+**D-separation:** Given a set of nodes $Z$, two nodes $X,Y$.
+
+- $X,Y$ are d-separated by $Z$ if all paths between $X,Y$ are blocked by $Z$.
+
+**(Global) Markov Assumption:** <!--Note: This section is a little ambiguous-->
+
+- Given: $P$ is Markov with respect to $G$.
+
+  If $X,Y$ are d-separated in $G$ conditioned on $Z$, then $X,Y$ are independent in $P$ conditioned on $Z$.
+  $$
+  X⫫_GY\ |\ Z\Longrightarrow X⫫_PY\ |\ Z
+  $$
+
+
+
+### Causal Graphs
+
+**Cause:** A variable $X$ is said to be a cause of a variable $Y$, if $Y$ can change in response to changes in $X$.
+
+**(Strict) Causal Edges Assumption:** In a directed graph, *every* parent is a direct cause of all its children.
+
+**(Non-strict) Causal Edges Assumption:** In a directed graph, *some* parent is a direct cause of all its children.
+
+<img src="figs\3.20.png" style="zoom:60%;" />
+
+Causation is a sub-category of association. Our objective is to isolate causation from association.
+
+**D-separation Implies Association is Causation:** Only association conducted from a chain is the causation.
+
+<img src="figs\3.a.png" style="zoom:60%;" />
+
+<img src="figs\3.21.png" style="zoom:70%;" />
+
+
+
+## 4 Causal Models
 
 
 
