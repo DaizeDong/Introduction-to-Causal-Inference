@@ -568,7 +568,7 @@ where the sufficient adjustment set for $T'\Longrightarrow Y$ is an empty set.
 
 # 6 Nonparametric Identification
 
-> ***Necessary and sufficient conditions for multiple variable interventions.***
+> ***Necessary and sufficient conditions for indentifiability.***
 
 ## 6.1 Frontdoor Adjustment
 
@@ -630,23 +630,104 @@ Proof: Check the textbook for details.
 
 ## 6.2 do-calculus
 
+### Fundamental Concepts
 
+$G_{\overline{X}}$: Graph with all incoming edges to nodes in set $X$ removed.
 
+$G_{\underline{X}}$: Graph with all outgoing edges to nodes in set $X$ removed.
 
+$⫫_G$: Independent in graph $G$.
 
+### Rules of do-calculus
 
+Given a causal graph $G$, an associated distribution $P$, and disjoint sets of variables $Y,T,Z,W$, the following rules hold:
 
+#### Rule 1 (remove $Z$)
 
+$$
+P\big(y\ |\ \text{do}(t),z,w\big)=P\big(y\ |\ \text{do}(t),w\big)\quad \text{if}\quad Y⫫_{G_\overline{T}}Z\ |\ T,W
+$$
 
+#### Rule 2 (convert $Z\leftrightarrow\text{do}(z)$)
 
+$$
+P\big(y\ |\ \text{do}(t),\text{do}(z),w\big)=P\big(y\ |\ \text{do}(t),z,w\big)\quad \text{if}\quad Y⫫_{G_{\overline{T},\underline{Z}}}Z\ |\ T,W
+$$
 
+#### Rule 3 (remove $\text{do}(z)$)
 
+$$
+P\big(y\ |\ \text{do}(t),\text{do}(z),w\big)=P\big(y\ |\ \text{do}(t),w\big)\quad \text{if}\quad Y⫫_{G_{\overline{T},\overline{Z(W)}}}Z\ |\ T,W
+$$
 
+where $Z(W)$ denotes the set of nodes of $Z$ that aren’t ancestors of any node of $W$ in $G_\overline{T}$.
 
+**Complete Proof with Graph Theory:** [(1994) Causal diagrams for empirical research.pdf](materials\(1994) Causal diagrams for empirical research.pdf) 
 
+**Proof of Completeness:**
 
+-  [(2006-AAAI) Identification of Joint Interventional Distributions in Recursive Semi-Markovian Causal Models.pdf](materials\proofs of completeness on do-calculus\(2006-AAAI) Identification of Joint Interventional Distributions in Recursive Semi-Markovian Causal Models.pdf) 
+-  [(2012) Pearl's Calculus of Intervention Is Complete.pdf](materials\proofs of completeness on do-calculus\(2012) Pearl's Calculus of Intervention Is Complete.pdf) 
+-  [(2012) Identification of Conditional Interventional Distributions.pdf](materials\proofs of completeness on do-calculus\(2012) Identification of Conditional Interventional Distributions.pdf) 
 
 ## 6.3 Determining Identifiability from the Graph
+
+The backdoor and frontdoor criteria have given identifiability under certain circumstances. However, there still exists plenty of causal estimands that don’t satisfy these two criteria. Those more general criteria are discussed as follows.
+
+### Single Variable Intervention
+
+**Unconfounded Children Criterion:** Given a treatment set $T$ and a single observed outcome variable $Y$, we define $M$ as a set of nodes that are the children of $T$ as well as the ancestors of $Y$. <u>If all backdoor paths from $T$ to $M$ can be blocked by intervening on $W$, then $P\big(Y=y\ |\ \text{do}(T=t)\big)$ is identifiable.</u>
+
+<img src="figs\6.12.png" style="zoom:55%;" />
+
+The unconfounded children criterion is a ***sufficient*** condition for identifiability.
+
+### Multiple Variable Interventions
+
+A ***necessary and sufficient*** condition for an observed outcome set $Y$ is provided by **the hedge criterion**.
+
+There also exists a more general type of causal estimand called **conditional causal effects**, form like $P(Y\ |\ \text{do}(t),X)$.
+
+
+
+
+
+# 7 Estimation
+
+> ***Tools for estimation.***
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
