@@ -14,6 +14,6 @@ Notes and slides on Brady Neal's online Causal Inference course in English. Cont
 
 ## Progress
 
-Chapter 6 Section 1 finished.
+Chapter 7 finished.
 
-**Last Update:** August 14th, 2022.
+**Last Update:** August 16th, 2022.
