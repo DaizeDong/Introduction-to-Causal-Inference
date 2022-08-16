@@ -1,6 +1,6 @@
 # Introduction to Causal Inference
 
-This is a brief note on [Brady Neal](https://www.bradyneal.com/aboutme)'s online causal inference course. Contents are arranged by the course textbook. Some sections are slightly modified according to my personal comprehension to help understanding. *Last update on August 1st, 2022.*
+This is a brief note on [Brady Neal](https://www.bradyneal.com/aboutme)'s online causal inference course. Contents are mainly arranged by the course textbook. Some sections are slightly modified according to my personal comprehension to help understanding. *Last update on August 16th, 2022.*
 
 **Course Website：** [Introduction to Causal Inference (bradyneal.com)](https://www.bradyneal.com/causal-inference-course)
 
@@ -184,7 +184,7 @@ $$
 
 A combination of consistency and no interference.
 
-## 2.4 Fancy Statistics Terminology Defancified
+## 2.4 Fancy Statistics Terminology De-fancified
 
 **Estimand:** The quantity that we want to estimate.
 
@@ -686,7 +686,7 @@ The unconfounded children criterion is a ***sufficient*** condition for identifi
 
 A ***necessary and sufficient*** condition for an observed outcome set $Y$ is provided by **the hedge criterion**.
 
-There also exists a more general type of causal estimand called **conditional causal effects**, form like $P(Y\ |\ \text{do}(t),X)$.
+There also exists a more general type of causal estimand called **conditional causal effects**, formulated like $P(Y\ |\ \text{do}(t),X)$.
 
 
 
@@ -694,21 +694,184 @@ There also exists a more general type of causal estimand called **conditional ca
 
 # 7 Estimation
 
-> ***Tools for estimation.***
+> ***Models for estimation.***
+
+## 7.1 Preliminaries
+
+### Concepts
+
+**ITE (Individual Treatment Effect):**
+$$
+\tau_i=Y_i(1)-Y_i(0)
+$$
+**ATE (Average Treatment Effect):**
+$$
+\tau=\mathbb{E}\big[Y_i(1)-Y_i(0)\big]\\
+$$
+**CATE (Conditional Average Treatment Effect):**
+$$
+\tau(x)=\mathbb{E}\big[Y_i(1)-Y_i(0)\ |\ X=x\big]\\
+$$
+**IATEs (Individualized Average Treatment Effects):**
+
+When $X$ contains all exogenous variables $I_i$ that may affect the potential outcomes $Y_i$ for each individual $i$, then we call *CATE* as *IATEs*. (Formulated like $\tau(x)=\mathbb{E}\big[Y_i(1)-Y_i(0)\ |\ X=x\big],\ X=\bigcup I_i\\$, where $I_i$ is the exogenous variables that affect $Y_i$)
+
+### Symbols
+
+**Conditional Outcome:**
+$$
+\begin{aligned}
+\mu(t,w)&=\mathbb{E}\big[Y\ |\ T=t,\ W=w\big]\\
+\mu(t,w,x)&=\mathbb{E}\big[Y\ |\ T=t,\ W=w,\ X=x\big]\\
+\end{aligned}
+$$
+
+We can rewrite ATE and CATE as follows with the new symbol:
+$$
+\begin{aligned}
+\tau&=\mathbb{E}\big[\mu(1,w)-\mu(0,w)\big]\\
+\tau(x)&=\mathbb{E}\big[\mu(1,w,x)-\mu(0,w,x)\big]
+\end{aligned}
+$$
+
+### Unconfoundedness Assumption
+
+When estimating an ATE, we assume that $W$ is a sufficient adjustment set.
+
+When estimating a CATE, we assume that $W\cup X$ is a sufficient adjustment set.
+
+## 7.2 Conditional Outcome Modeling (COM)
+
+The conditional outcome model (COM) directly fits $\mu$ using a single estimator $\hat{\mu}$.
+
+<img src="figs\7.2a.png" style="zoom:70%;" />
+
+### Estimates
+
+| Estimates              | Results                                                      |
+| ---------------------- | ------------------------------------------------------------ |
+| ITE for individual $i$ | $\hat{\tau}_i=\hat{\mu}(1,w_i)-\hat{\mu}(0,w_i)$             |
+| ATE                    | $\hat{\tau}=\dfrac{1}{n}\sum_i^n\big[\hat{\mu}(1,w_i)-\hat{\mu}(0,w_i)\big]\\$ |
+
+### Conditional Estimates
+
+| Conditional Estimates   | Results                                                      |
+| ----------------------- | ------------------------------------------------------------ |
+| IATE for individual $i$ | $\hat{\tau}(x_i)=\hat{\mu}(1,w_i,x_i)-\hat{\mu}(0,w_i,x_i)$  |
+| CATE                    | $\hat{\tau}(x)=\dfrac{1}{n_x}\sum_{i:x_i=x}\big[\hat{\mu}(1,w_i,x_i)-\hat{\mu}(0,w_i,x_i)\big]\\$,<br />where $n_x$ denotes the number of data points that $x_i=x$. |
+
+Under conditioned circumstances, though IATE is different from ITE, it is common to represent ITE with IATE:
+$$
+\hat{\tau}_i=\hat{\tau}(x_i)=\hat{\mu}(1,w_i,x_i)-\hat{\mu}(0,w_i,x_i)
+$$
+Though, this will likely be unreliable due to <u>severe positivity violation</u>.
+
+## 7.3 Grouped Conditional Outcome Modeling (GCOM)
+
+The grouped conditional outcome model (GCOM) fits $\mu$ using two estimators $\hat{\mu}_1,\hat{\mu}_0$.
+
+Usually, $T$ is one-dimensional and $W$ is high-dimensional, while both of them hold equal importance. It is hard for a single model to distinguish one-dimensional $T$ from the high-dimensional $T+W$ so that the importance of $T$ is reduced. To solve this problem, a heuristic method is to separate the model into two parts by the value of $T$.
+
+<img src="figs\7.2b.png" style="zoom:70%;" />
+
+### Estimates
+
+| Estimates              | Results                                                      |
+| ---------------------- | ------------------------------------------------------------ |
+| ITE for individual $i$ | $\hat{\tau}_i=\hat{\mu}_1(w_i)-\hat{\mu}_0(w_i)$             |
+| ATE                    | $\hat{\tau}=\dfrac{1}{n}\sum_i^n\big[\hat{\mu}_1(w_i)-\hat{\mu}_0(w_i)\big]\\$ |
+
+### Conditional Estimates
+
+| Conditional Estimates   | Results                                                      |
+| ----------------------- | ------------------------------------------------------------ |
+| IATE for individual $i$ | $\hat{\tau}(x_i)=\hat{\mu}_1(w_i,x_i)-\hat{\mu}_0(w_i,x_i)$  |
+| CATE                    | $\hat{\tau}(x)=\dfrac{1}{n_x}\sum_{i:x_i=x}\big[\hat{\mu}_1(w_i,x_i)-\hat{\mu}_0(w_i,x_i)\big]\\$,<br />where $n_x$ denotes the number of data points that $x_i=x$. |
+
+## 7.4 Increasing Data Efficiency
+
+The GCOM solves the problem of unbalanced feature sizes, but it is inefficient as each model only takes in a subset of the whole dataset. There are a few structures that aim to solve this problem.
+
+### TARNet
+
+TARNet is structured like the Mixture of Experts (MoE) model. All treatments share a common bottom in the first few layers, while the network branches off for each treatment after the bottom layer.
+
+<img src="figs\7.2c.png" style="zoom:70%;" />
+
+### X-Learner
+
+Instead of modifying the structure of the model, X-Learner modifies the calculation steps of ITE / IATE on GCOM.
+
+Take IATE $\hat{\tau}(x_i)$ for example:
+
+#### Step 1
+
+Same as the standard GCOM, calculate $\hat{\mu}_1(w_i,x_i)$ and $\hat{\mu}_0(w_i,x_i)$.
+
+#### Step 2
+
+Specify the IATE for each treatment, calculate as follows:
+$$
+\hat{\tau}_1(x_i)=Y_i(1)-\hat{\mu}_0(w_i,x_i)\\
+\hat{\tau}_0(x_i)=\hat{\mu}_1(w_i,x_i)-Y_i(0)
+$$
+With this operation, we separately use the data from two treatments. This is also where "X" comes in its name.
+
+#### Step 3
+
+Aggregate the specified IATE together with a weighting function $g(x)$:
+$$
+\hat{\tau}(x_i)=g(x)\hat{\tau}_0(x_i)+(1-g(x))\hat{\tau}_1(x_i)
+$$
+With this operation, we aggregate the data from two treatments and estimate IATE from the whole dataset.
+
+## 7.5 Propensity Scores
+
+Use a model to squeeze $W$ into a one-dimensional propensity score $e(W)$ and treat it as the new condition.
+$$
+W\quad\Longrightarrow\quad  e(W)\\
+\big(Y(1)-Y(0)\big)⫫T\ |\ W\quad\Longrightarrow\quad\big(Y(1)-Y(0)\big)⫫T\ |\ e(W)
+$$
+<img src="figs\7.4.png" style="zoom:55%;" />
+
+### Inverse Probability Weighting (IPW)
+
+We can also make model-free prediction by reweighting data so that $T⫫W$ when $e(W)=P(Y=1|W)$.
+
+In other words, remove the association between $T$ and $W$, following the same principle with randomized experiments.
+$$
+\begin{aligned}
+\tau&=\mathbb{E}_W\Big[\mathbb{E}\big[Y|T=1,W\big]-\mathbb{E}\big[Y|T=0,W\big]\Big]\\
+&=\mathbb{E}_W\Big[\mathbb{E}\big[Y|T=1,W\big]\Big]-\mathbb{E}_W\Big[\mathbb{E}\big[Y|T=0,W\big]\Big]\quad\text{(T is independent from W)}\\
+&=\mathbb{E}\bigg[\dfrac{\mathbb{1}(T=1)Y}{P(T=1|W)}\bigg]-\mathbb{E}\bigg[\dfrac{\mathbb{1}(T=0)Y}{P(T=0|W)}\bigg]\quad\text{(Appendix A.3)}\\
+&=\mathbb{E}\bigg[\dfrac{\mathbb{1}(T=1)Y}{e(W)}\bigg]-\mathbb{E}\bigg[\dfrac{\mathbb{1}(T=0)Y}{1-e(W)}\bigg]
+\end{aligned}
+$$
+where $\mathbb{1}(T=t)Y=\begin{cases}Y,\quad T=t\\0,\quad\ T\ne t\end{cases}$.
+
+### Doubly Robust Methods
+
+Combine $\mu(t,w)$ and $e(W)$ together.
+
+We can construct a model on $T,e(W)$ instead of $T,W$ to predict $\tau$.
+
+## 7.6 Other Methods
+
+Matching, Double Machine Learning, Causal Trees and Forests, etc.
+
+## 7.7 Concluding Remarks
+
+Calculate confidence intervals on these estimates is necessary.
+
+<u>**Comparison to Randomized Experiments:** These methods only address observed confounding, while randomized experiments also eliminates unobserved confounding.</u>
 
 
 
 
 
+# 8 Unobserved Confounding: Bounds and Sensitivity Analysis
 
-
-
-
-
-
-
-
-
+> ***Trade off between assumption and precision.***
 
 
 
