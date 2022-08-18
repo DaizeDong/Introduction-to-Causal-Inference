@@ -1,6 +1,6 @@
 # Introduction to Causal Inference
 
-This is a brief note on [Brady Neal](https://www.bradyneal.com/aboutme)'s online causal inference course. Contents are mainly arranged by the course textbook. Some sections are slightly modified according to my personal comprehension to help understanding. *Last update on August 16th, 2022.*
+This is a brief note on [Brady Neal](https://www.bradyneal.com/aboutme)'s online causal inference course. Contents are mainly arranged by the course textbook. Some sections are slightly modified according to my personal comprehension to help understanding. *Last update on August 18th, 2022.*
 
 **Course Website：** [Introduction to Causal Inference (bradyneal.com)](https://www.bradyneal.com/causal-inference-course)
 
@@ -843,7 +843,7 @@ $$
 \begin{aligned}
 \tau&=\mathbb{E}_W\Big[\mathbb{E}\big[Y|T=1,W\big]-\mathbb{E}\big[Y|T=0,W\big]\Big]\\
 &=\mathbb{E}_W\Big[\mathbb{E}\big[Y|T=1,W\big]\Big]-\mathbb{E}_W\Big[\mathbb{E}\big[Y|T=0,W\big]\Big]\quad\text{(T is independent from W)}\\
-&=\mathbb{E}\bigg[\dfrac{\mathbb{1}(T=1)Y}{P(T=1|W)}\bigg]-\mathbb{E}\bigg[\dfrac{\mathbb{1}(T=0)Y}{P(T=0|W)}\bigg]\quad\text{(Appendix A.3)}\\
+&=\mathbb{E}\bigg[\dfrac{\mathbb{1}(T=1)Y}{P(T=1|W)}\bigg]-\mathbb{E}\bigg[\dfrac{\mathbb{1}(T=0)Y}{P(T=0|W)}\bigg]\quad\text{(Appendix A.3 in course book)}\\
 &=\mathbb{E}\bigg[\dfrac{\mathbb{1}(T=1)Y}{e(W)}\bigg]-\mathbb{E}\bigg[\dfrac{\mathbb{1}(T=0)Y}{1-e(W)}\bigg]
 \end{aligned}
 $$
@@ -853,7 +853,7 @@ where $\mathbb{1}(T=t)Y=\begin{cases}Y,\quad T=t\\0,\quad\ T\ne t\end{cases}$.
 
 Combine $\mu(t,w)$ and $e(W)$ together.
 
-We can construct a model on $T,e(W)$ instead of $T,W$ to predict $\tau$.
+We can construct a model $\hat{\mu}$ following the above methods on $T,e(W)$ instead of $T,W$ to predict $\tau$.
 
 ## 7.6 Other Methods
 
@@ -871,7 +871,326 @@ Calculate confidence intervals on these estimates is necessary.
 
 # 8 Unobserved Confounding: Bounds and Sensitivity Analysis
 
-> ***Trade off between assumption and precision.***
+> ***Trade-off between precision and assumptions.***
+
+<u>***Note:** Be sure to refer to the proofs and examples on the course book to help understanding.*</u>
+
+## 8.1 Bounds
+
+**The Law of Decreasing Credibility:** The credibility of inference decreases with the strength of the assumptions maintained.
+
+This section considers some weaker assumptions which give the intervals where $\tau$ will fall rather than giving a specific score with the assumption of unconfoundedness.
+
+We take the medical treatment as an example. The treatment $T=1$ denotes taking medication while $T=0$ denotes not taking it. And $Y$ denotes the outcome that whether the patient survived or not.
+
+We care about the sign of $\tau=\mathbb{E}\big[Y(1)-Y(0)\big]$ that denotes whether potential outcome of taking medication $Y(1)$ is better than not taking it $Y(0)$.
+
+### Plain Bound
+
+To begin with, we need to assume a basic bound for the potential outcomes.
+
+**Bounded Potential Outcomes:**
+$$
+a\le Y(t)\le b,\quad\forall t
+$$
+We can directly get the bound for $\mathbb{E}\big[Y(1)-Y(0)\big]$ from the bounded potential outcomes:<!--Textbook P74-->
+$$
+a-b\le\mathbb{E}\big[Y(1)-Y(0)\big]\le b-a
+$$
+
+### No-Assumptions Bound
+
+The plain bound can be narrowed with no extra assumptions introduced via decomposition.
+
+**Observational-Counterfactual Decomposition:**
+$$
+\begin{aligned}
+\mathbb{E}\big[Y(1)-Y(0)\big]=&\quad\ \pi\mathbb{E}\big[Y(1)\ |\ T=1\big]+(1-\pi)\mathbb{E}\big[Y(1)\ |\ T=0\big]\\
+&-\pi\mathbb{E}\big[Y(0)\ |\ T=1\big]-(1-\pi)\mathbb{E}\big[Y(0)\ |\ T=0\big]\\
+\\
+=&\quad\ \pi\mathbb{E}\big[Y\ |\ T=1\big]+(1-\pi)\mathbb{E}\big[Y(1)\ |\ T=0\big]\\
+&-\pi\mathbb{E}\big[Y(0)\ |\ T=1\big]-(1-\pi)\mathbb{E}\big[Y\ |\ T=0\big]\\
+\end{aligned}
+$$
+where $\pi\overset{\Delta}{=}P(T=1)$ for short.
+
+- We can get $\mathbb{E}\big[Y\ |\ T=1\big],\ \mathbb{E}\big[Y\ |\ T=0\big]$ directly from observation.
+- We can't get $\mathbb{E}\big[Y(0)\ |\ T=1\big],\ \mathbb{E}\big[Y(1)\ |\ T=0\big]$ as they are counterfactuals.
+
+We can get a tighter bound with observational-counterfactual decomposition applied:<!--Textbook P75-->
+
+$$
+\mathbb{E}\big[Y(1)-Y(0)\big]\le\pi\mathbb{E}\big[Y\ |\ T=1\big]+(1-\pi)b-\pi a-(1-\pi)\mathbb{E}\big[Y\ |\ T=0\big]\\
+\mathbb{E}\big[Y(1)-Y(0)\big]\ge\pi\mathbb{E}\big[Y\ |\ T=1\big]+(1-\pi)a-\pi b-(1-\pi)\mathbb{E}\big[Y\ |\ T=0\big]
+$$
+
+### Monotone Treatment Response (MTR)
+
+#### Nonnegative MTR
+
+This assumes that the treatment can only help (e.g., taking elixir):
+$$
+Y_i(1)\ge Y_i(0),\ \forall i
+$$
+This is equal to:
+$$
+\mathbb{E}\big[Y(1)\ |\ T=1\big]\ge\mathbb{E}\big[Y(0)\ |\ T=1\big]\\
+\mathbb{E}\big[Y(1)\ |\ T=0\big]\ge\mathbb{E}\big[Y(0)\ |\ T=0\big]
+$$
+We can get the <u>lower bound</u> for nonnegative MTR:<!--Textbook P77-->
+$$
+\mathbb{E}\big[Y(1)-Y(0)\big]\ge0
+$$
+
+#### Nonpositive MTR
+
+This assumes that the treatment can only hurt (e.g., taking poison):
+$$
+Y_i(1)\le Y_i(0),\ \forall i
+$$
+This is equal to:
+$$
+\mathbb{E}\big[Y(1)\ |\ T=1\big]\le\mathbb{E}\big[Y(0)\ |\ T=1\big]\\
+\mathbb{E}\big[Y(1)\ |\ T=0\big]\le\mathbb{E}\big[Y(0)\ |\ T=0\big]
+$$
+We can get the <u>upper bound</u> for nonpositive MTR:<!--Textbook P77-->
+$$
+\mathbb{E}\big[Y(1)-Y(0)\big]\le0
+$$
+
+### Monotone Treatment Selection (MTS)
+
+**(Nonnegative MTS)** This assumes that treatment groups’ potential outcomes are better than control groups’:
+$$
+\mathbb{E}\big[Y(1)\ |\ T=1\big]\ge\mathbb{E}\big[Y(1)\ |\ T=0\big]\\
+\mathbb{E}\big[Y(0)\ |\ T=1\big]\ge\mathbb{E}\big[Y(0)\ |\ T=0\big]
+$$
+<u>*MTS focuses on the group, while MTR focuses on the outcome.*</u>
+
+We can get the <u>upper bound</u> for (Nonnegative) MTS:<!--Textbook P78-->
+$$
+\mathbb{E}\big[Y(1)-Y(0)\big]\le\mathbb{E}\big[Y\ |\ T=1\big]-\mathbb{E}\big[Y\ |\ T=0\big]
+$$
+
+### Optimal Treatment Selection (OTS)
+
+This assumes that the individuals always receive the treatment that is best for them:
+$$
+T_i=0\quad\Longleftrightarrow\quad Y_i(0)\ge Y_i(1)\\
+T_i=1\quad\Longleftrightarrow\quad Y_i(0)< Y_i(1)
+$$
+
+#### OTS Bound 1
+
+From OTS, we can deduce that:
+$$
+\mathbb{E}\big[Y(1)\ |\ T=1\big]\ge\mathbb{E}\big[Y(0)\ |\ T=1\big]\\
+\mathbb{E}\big[Y(0)\ |\ T=0\big]\ge\mathbb{E}\big[Y(1)\ |\ T=0\big]
+$$
+So we can get a bound with the above condition applied:<!--Textbook P79-->
+$$
+\begin{aligned}
+\mathbb{E}\big[Y(1)-Y(0)\big]&\le\pi\mathbb{E}\big[Y\ |\ T=1\big]-\pi a\\
+\mathbb{E}\big[Y(1)-Y(0)\big]&\ge(1-\pi)a-(1-\pi)\mathbb{E}\big[Y\ |\ T=0\big]
+\end{aligned}
+$$
+
+#### OTS Bound 2
+
+From OTS, we can also deduce that:
+$$
+\mathbb{E}\big[Y(1)\ |\ T=1\big]\ge\mathbb{E}\big[Y(1)\ |\ T=0\big]\\
+\mathbb{E}\big[Y(0)\ |\ T=0\big]\ge\mathbb{E}\big[Y(0)\ |\ T=1\big]
+$$
+So we can get a bound with the above condition applied:<!--Textbook P81-->
+$$
+\begin{aligned}
+\mathbb{E}\big[Y(1)-Y(0)\big]&\le\mathbb{E}\big[Y\ |\ T=1\big]-\pi a-(1-\pi)\mathbb{E}\big[Y\ |\ T=0\big]\\
+\mathbb{E}\big[Y(1)-Y(0)\big]&\ge\pi\mathbb{E}\big[Y\ |\ T=1\big]+(1-\pi)a-\mathbb{E}\big[Y\ |\ T=0\big]
+\end{aligned}
+$$
+
+#### Mixing Bounds
+
+Combine the two OTS bounds together, we can get a tighter bound:
+$$
+\begin{aligned}
+\text{if}\ \ \mathbb{E}\big[Y\ |\ T=0\big]\le\mathbb{E}\big[Y\ |\ T=1\big]&:\\
+\mathbb{E}\big[Y(1)-Y(0)\big]&\le\pi\mathbb{E}\big[Y\ |\ T=1\big]-\pi a\\
+\mathbb{E}\big[Y(1)-Y(0)\big]&\ge\pi\mathbb{E}\big[Y\ |\ T=1\big]+(1-\pi)a-\mathbb{E}\big[Y\ |\ T=0\big]\\
+\\
+\text{if}\ \ \mathbb{E}\big[Y\ |\ T=0\big]>\mathbb{E}\big[Y\ |\ T=1\big]&:\\
+\mathbb{E}\big[Y(1)-Y(0)\big]&\le\mathbb{E}\big[Y\ |\ T=1\big]-\pi a-(1-\pi)\mathbb{E}\big[Y\ |\ T=0\big]\\
+\mathbb{E}\big[Y(1)-Y(0)\big]&\ge(1-\pi)a-(1-\pi)\mathbb{E}\big[Y\ |\ T=0\big]
+\end{aligned}
+$$
+
+## 8.2 Sensitivity Analysis
+
+This section discusses the effect of unobserved confounders on the calculated results.
+
+### Linear Setting
+
+<img src="figs\8.3.png" style="zoom:55%;" />
+$$
+\begin{aligned}
+T&:=\alpha_wW+\alpha_uU\\
+Y&:=\beta_wW+\beta_uU+\delta T\\
+\end{aligned}
+$$
+
+#### Confounder Bias
+
+The ATE we get when conditioning on $W,U$:<!--Textbook P83-->
+$$
+\begin{aligned}
+\tau_{w,u}&=\mathbb{E}\big[Y(1)-Y(0)\big]\\
+&=\mathbb{E}_{W,U}\Big[\mathbb{E}\big[Y\ |\ T=1,W,U\big]-\mathbb{E}\big[Y\ |\ T=0,W,U\big]\Big]\\
+&=\delta
+\end{aligned}
+$$
+The ATE we get when conditioning on $W$:<!--Textbook P83-->
+$$
+\begin{aligned}
+\tau_{w}&=\mathbb{E}\big[Y(1)-Y(0)\big]\\
+&=\mathbb{E}_{W}\Big[\mathbb{E}\big[Y\ |\ T=1,W\big]-\mathbb{E}\big[Y\ |\ T=0,W\big]\Big]\\
+&=\delta+\dfrac{\beta_u}{\alpha_u}
+\end{aligned}
+$$
+So we get the bias from the unobserved confounder $U$:
+$$
+\begin{aligned}
+\text{bias}&=\tau_{w,u}-\tau_{w}\\
+&=\delta+\dfrac{\beta_u}{\alpha_u}-\delta\\
+&=\dfrac{\beta_u}{\alpha_u}
+\end{aligned}
+$$
+
+#### Sensitivity Contour Plots
+
+To explicitly show the effect of bias on the outcome, we can check the contour plots.
+
+Left: Contour of bias $\dfrac{\beta_u}{\alpha_u}$.
+
+Right: Contour of $\delta$ when $\tau_{w}=\delta+\dfrac{\beta_u}{\alpha_u}=25$.
+
+<img src="figs\8.5.png" style="zoom:65%;" />
+
+### More General Settings
+
+**Extend $T$ to sigmoid form:**
+
+[(2003) Sensitivity to Exogeneity Assumptions in Program Evaluation.pdf](materials\sensitivity analysis\(2003) Sensitivity to Exogeneity Assumptions in Program Evaluation.pdf) 
+
+**Extend to nonparametric form:**
+
+[(2020) Making Sense of Sensitivity Extending Omitted Variable Bias.pdf](materials\sensitivity analysis\(2020) Making Sense of Sensitivity Extending Omitted Variable Bias.pdf) 
+
+**Many other options:**
+
+Check the textbook.
+
+
+
+
+
+# 9 Instrumental Variables
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
