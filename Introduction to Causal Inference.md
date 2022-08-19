@@ -1,6 +1,6 @@
 # Introduction to Causal Inference
 
-This is a brief note on [Brady Neal](https://www.bradyneal.com/aboutme)'s online causal inference course. Contents are mainly arranged by the course textbook. Some sections are slightly modified according to my personal comprehension to help understanding. *Last update on August 18th, 2022.*
+This is a brief note on [Brady Neal](https://www.bradyneal.com/aboutme)'s online causal inference course. The Content is mainly arranged by the course textbook. Some sections are slightly modified according to personal comprehension to help understanding. *Last update on August 19th, 2022.*
 
 **Course Website：** [Introduction to Causal Inference (bradyneal.com)](https://www.bradyneal.com/causal-inference-course)
 
@@ -32,7 +32,7 @@ This is a brief note on [Brady Neal](https://www.bradyneal.com/aboutme)'s online
 
 # 1 Motivation: Why You Might Care
 
-> ***Distinguish association and causation.***
+> ***Distinguish causation from association.***
 
 ## 1.1 Association is Not Causation
 
@@ -526,7 +526,7 @@ P\big(X\ |\ T'=1\big)\overset{d}{=}P\big(X\big)
 P\big(X\ |\ T'=0\big)\overset{d}{=}P\big(X\ |\ T'=1\big)
 \end{aligned}
 $$
-In other words, $X$ is independent from $T'$.
+In other words, $X$ is independent of $T'$.
 
 Proof of *association is causation:*
 $$
@@ -842,7 +842,7 @@ In other words, remove the association between $T$ and $W$, following the same p
 $$
 \begin{aligned}
 \tau&=\mathbb{E}_W\Big[\mathbb{E}\big[Y|T=1,W\big]-\mathbb{E}\big[Y|T=0,W\big]\Big]\\
-&=\mathbb{E}_W\Big[\mathbb{E}\big[Y|T=1,W\big]\Big]-\mathbb{E}_W\Big[\mathbb{E}\big[Y|T=0,W\big]\Big]\quad\text{(T is independent from W)}\\
+&=\mathbb{E}_W\Big[\mathbb{E}\big[Y|T=1,W\big]\Big]-\mathbb{E}_W\Big[\mathbb{E}\big[Y|T=0,W\big]\Big]\quad\text{(T is independent of W)}\\
 &=\mathbb{E}\bigg[\dfrac{\mathbb{1}(T=1)Y}{P(T=1|W)}\bigg]-\mathbb{E}\bigg[\dfrac{\mathbb{1}(T=0)Y}{P(T=0|W)}\bigg]\quad\text{(Appendix A.3 in course book)}\\
 &=\mathbb{E}\bigg[\dfrac{\mathbb{1}(T=1)Y}{e(W)}\bigg]-\mathbb{E}\bigg[\dfrac{\mathbb{1}(T=0)Y}{1-e(W)}\bigg]
 \end{aligned}
@@ -1078,7 +1078,7 @@ Right: Contour of $\delta$ when $\tau_{w}=\delta+\dfrac{\beta_u}{\alpha_u}=25$.
 
 ### More General Settings
 
-**Extend $T$ to sigmoid form:**
+**Extend $T$ to nonlinear form:**
 
 [(2003) Sensitivity to Exogeneity Assumptions in Program Evaluation.pdf](materials\sensitivity analysis\(2003) Sensitivity to Exogeneity Assumptions in Program Evaluation.pdf) 
 
@@ -1096,40 +1096,253 @@ Check the textbook.
 
 # 9 Instrumental Variables
 
+> ***Estimate with unobserved confounders.***
 
+## 9.1 Preliminaries
 
+<!--It seems that this is a stronger assumption based on the Unconfounded Children Criterion.-->
 
+**Instrument:**
 
+A variable $Z$ can be considered as an instrument if the following assumptions are satisfied:
 
+1. Relevance: $Z$ has a causal effect on $T$.
+2. Exclusion Restriction: The causal effect of $Z$ on $Y$ is fully mediated by $T$.
+3. Instrumental Unconfoundedness: There are no backdoor paths from $Z$ to $Y$.
+
+**Conditional Instrument:**
+
+1. Relevance.
+2. Exclusion Restriction.
+3. **Conditional** Instrumental Unconfoundedness: There are no backdoor paths from $Z$ to $Y$ <u>conditioned on $W$</u>.
 
+## 9.2 Parametric Situations
+
+The instrument variables allow us to find the causal effect of $T$ on $Y$, but under specified conditions.
+
+<u>Specifically, the causal model must have a parametric form, e.g. linear.</u>
+
+<img src="figs\9.1.png" style="zoom:60%;" />
+
+We assume that the outcome $Y$ is in a linear form:
+$$
+Y:=\delta T+\alpha_uU
+$$
+
+### Binary Linear Setting
+
+In this setting we have $T,Z\in\{0,1\}$.
+
+By conditioning on $T$, we can get the **Wald Estimand**:
+$$
+\delta=\dfrac{\mathbb{E}\big[Y|Z=1\big]-\mathbb{E}\big[Y|Z=0\big]}{\mathbb{E}\big[T|Z=1\big]-\mathbb{E}\big[T|Z=0\big]}
+$$
+Proof:
+$$
+\begin{aligned}
+\mathbb{E}\big[Y|Z=1\big]-\mathbb{E}\big[Y|Z=0\big]&=\mathbb{E}\big[\delta T+\alpha_uU|Z=1\big]-\mathbb{E}\big[\delta T+\alpha_uU|Z=0\big]\\
+&=\delta\Big(\mathbb{E}\big[T|Z=1\big]-\mathbb{E}\big[T|Z=0\big]\Big)+\alpha_u\Big(\mathbb{E}\big[U|Z=1\big]-\mathbb{E}\big[U|Z=0\big]\Big)\\
+&=\delta\Big(\mathbb{E}\big[T|Z=1\big]-\mathbb{E}\big[T|Z=0\big]\Big)+\alpha_u\Big(\mathbb{E}\big[U\big]-\mathbb{E}\big[U\big]\Big)\quad\text{(U is independent of Z)}\\
+&=\delta\Big(\mathbb{E}\big[T|Z=1\big]-\mathbb{E}\big[T|Z=0\big]\Big)
+\end {aligned}
+$$
+As each term in the Wald Estimand can be observed, we can directly get the causal effect.
+
+### Continuous Linear Setting
+
+In this setting $T$ and $Z$ are continuous rather than binary.
+
+Similar to the binary setting, we can get the **Wald Estimand**:
+$$
+\delta=\dfrac{\text{Cov}(Y,Z)}{\text{Cov}(T,Z)}
+$$
+where $\text{Cov}$ denotes the covariance.
+
+Proof:
+$$
+\begin{aligned}
+\text{Cov}(Y,Z)&=\mathbb{E}\big[YZ\big]-\mathbb{E}\big[Y\big]\mathbb{E}\big[Z\big]\\
+&=\mathbb{E}\big[(\delta T+\alpha_uU)Z\big]-\mathbb{E}\big[\delta T+\alpha_uU\big]\mathbb{E}\big[Z\big]\\
+&=\delta\Big(\mathbb{E}\big[TZ\big]-\mathbb{E}\big[T\big]\mathbb{E}\big[Z\big]\Big)+\alpha_u\Big(\mathbb{E}\big[UZ\big]-\mathbb{E}\big[U\big]\mathbb{E}\big[Z\big]\Big)\\
+&=\delta\Big(\mathbb{E}\big[TZ\big]-\mathbb{E}\big[T\big]\mathbb{E}\big[Z\big]\Big)+\alpha_u\Big(\mathbb{E}\big[U\big]\mathbb{E}\big[Z\big]-\mathbb{E}\big[U\big]\mathbb{E}\big[Z\big]\Big)\quad\text{(U is independent of Z)}\\
+&=\delta\Big(\mathbb{E}\big[TZ\big]-\mathbb{E}\big[T\big]\mathbb{E}\big[Z\big]\Big)\\
+&=\delta\ \text{Cov}(T,Z)\\
+\end {aligned}
+$$
+So we can directly model $\hat{\delta}=\dfrac{\hat{\text{Cov}}(Y,Z)}{\hat{\text{Cov}}(T,Z)}$, or using **two-stage least squares estimator (2SLS)**.<!--Textbook P89-->
+
+## 9.3 Nonparametric Situations
+
+In this section we assume the binary setting that $T,Z\in\{0,1\}$.
+
+### Fundamental Concepts
+
+**New potential Notations:**
+$$
+\begin{aligned}
+T(z)&=T(Z=z)\\
+Y(t)&=Y(T=t)\\
+\end{aligned}
+$$
+**Principal Strata:**
+
+| Name          | Description                                                  | Equation          |
+| ------------- | ------------------------------------------------------------ | ----------------- |
+| Compliers     | Always take the treatment that they’re encouraged to take.   | $T(1)=1,\ T(0)=0$ |
+| Defiers       | Always take the opposite treatment of that they are encouraged to take. | $T(1)=0,\ T(0)=1$ |
+| Always-takers | Always take the treatment, regardless of encouragement.      | $T(1)=1,\ T(0)=1$ |
+| Never-takers  | Never take the treatment, regardless of encouragement.       | $T(1)=0,\ T(0)=0$ |
+
+<img src="figs\9.a.png" style="zoom:60%;" />
+
+Given some observed value of $T$ and $Z$, we can’t actually identify which stratum we’re in. (**Can’t Identify Stratum**)
+
+1. $T(0)=0$: compliers or never-takers.
+2. $T(0)=1$: defiers or always-takers.
+3. $T(1)=0$: defiers or never-takers.
+4. $T(1)=1$: compliers or always-takers.
+
+**Local Average Treatment Effect (LATE) / Complier Average Causal Effect (CACE):**
+$$
+\mathbb{E}\big[Y(1)-Y(0)\ |\ T(1)=1,\ T(0)=0\big]
+$$
+**Monotonicity Assumption:**
+$$
+T_i(1)\ge T_i(0),\quad\forall i
+$$
+This assumes that there are no defiers.
+
+### LATE Nonparametric Identification
+
+Given that $Z$ is an instrument, $Z$ and $T$ are binary variables and monotonicity holds, the following is true:
+$$
+\mathbb{E}\big[Y(1)-Y(0)\ |\ T(1)=1,\ T(0)=0\big]=\dfrac{\mathbb{E}\big[Y|Z=1\big]-\mathbb{E}\big[Y|Z=0\big]}{\mathbb{E}\big[T|Z=1\big]-\mathbb{E}\big[T|Z=0\big]}
+$$
+**Proof:**
+
+First we apply the Law of Total Probability:
+$$
+\begin{aligned}
+\mathbb{E}\big[Y(Z=1)-Y(Z=0)\big]=\ &\quad\ \mathbb{E}\big[Y(1)-Y(0)\ |\ T(1)=1,\ T(0)=0\big]P\big(T(1)=1,\ T(0)=0\big)\\
+&+\mathbb{E}\big[Y(1)-Y(0)\ |\ T(1)=0,\ T(0)=1\big]P\big(T(1)=0,\ T(0)=1\big)\quad\text{(Violation of Monotonicity)}\\
+&+\mathbb{E}\big[Y(1)-Y(0)\ |\ T(1)=1,\ T(0)=1\big]P\big(T(1)=1,\ T(0)=1\big)\quad\text{(No causal effects)}\\
+&+\mathbb{E}\big[Y(1)-Y(0)\ |\ T(1)=0,\ T(0)=0\big]P\big(T(1)=0,\ T(0)=0\big)\quad\text{(No causal effects)}\\
+=\ &\quad\ \mathbb{E}\big[Y(1)-Y(0)\ |\ T(1)=1,\ T(0)=0\big]P\big(T(1)=1,\ T(0)=0\big)\\
+\end{aligned}\\
+$$
+We also have:
+$$
+\begin{aligned}
+\mathbb{E}\big[Y(Z=1)-Y(Z=0)\big]&=\mathbb{E}\big[Y|Z=1\big]-\mathbb{E}\big[Y|Z=0\big]\qquad\textbf{(Instrumental Unconfoundedness)}\\
+P\big(T(1)=1,\ T(0)=0\big)&=1-P\big(T(1)=1,\ T(0)=1\big)-P\big(T(1)=0,\ T(0)=0\big)\qquad\textbf{(Subtract Other Strata)}\\
+&=1-P\big(T(0)=1\big)-P\big(T(1)=0\big)\qquad\textbf{(No Defiers)}\\
+&=1-P\big(T(0)=1\big)-\Big(1-P\big(T(1)=1\big)\Big)\\
+&=P\big(T(1)=1\big)-P\big(T(0)=1\big)\\
+&=P\big(T|Z=1\big)-P\big(T|Z=1\big)\\
+&=\mathbb{E}\big[T|Z=1\big]-\mathbb{E}\big[T|Z=0\big]\qquad\textbf{(Binary Setting)}\\
+\end{aligned}
+$$
+Finally we get:
+$$
+\begin{aligned}
+\mathbb{E}\big[Y(1)-Y(0)\ |\ T(1)=1,\ T(0)=0\big]&=\dfrac{\mathbb{E}\big[Y(Z=1)-Y(Z=0)\big]}{P\big(T(1)=1,\ T(0)=0\big)}\\
+&=\dfrac{\mathbb{E}\big[Y|Z=1\big]-\mathbb{E}\big[Y|Z=0\big]}{\mathbb{E}\big[T|Z=1\big]-\mathbb{E}\big[T|Z=0\big]}
+\end{aligned}
+$$
 
+## 9.4 More General Situations (Semi-parametric)
 
+The outcome is generated by a complex function of $T$ and $W$ plus some additive unobserved confounders $U$:
 
+$$
+Y:=f(T,W)+U
+$$
+[(2017-ICML) Deep IV A Flexible Approach for Counterfactual Prediction.pdf](materials\instrumental variables\(2017-ICML) Deep IV A Flexible Approach for Counterfactual Prediction.pdf) 
 
+[(2021-ICLR) Learning deep features in instrumental variable regression.pdf](materials\instrumental variables\(2021-ICLR) Learning deep features in instrumental variable regression.pdf) 
 
+We can also give up on point identification and settle for set identification (bounds):
+$$
+Y:=f(T,U)
+$$
+[(2020-NIPS) A class of algorithms for general instrumental variable models.pdf](materials\instrumental variables\(2020-NIPS) A class of algorithms for general instrumental variable models.pdf) 
 
 
 
 
 
+# 10 Difference in Differences
 
+> ***Potential outcomes in the stochastic process.***
 
+## 10.1 Preliminaries
 
+### Fundamental Concepts
 
+**Average Treatment Effect on the Treated (ATT):**
+$$
+\begin{aligned}
+\mathbb{E}\big[Y(1)-Y(0)\ |\ T=1\big]&=\mathbb{E}\big[Y(1)\ |\ T=1\big]-\mathbb{E}\big[Y(0)\ |\ T=1\big]\\
+&=\mathbb{E}\big[Y\ |\ T=1\big]-\mathbb{E}\big[Y(0)\ |\ T=1\big]\\
+&=\mathbb{E}\big[Y\ |\ T=1\big]-\mathbb{E}\big[Y(0)\ |\ T=0\big]\quad\text{(Unconfoundness for ATT)}\\
+&=\mathbb{E}\big[Y\ |\ T=1\big]-\mathbb{E}\big[Y\ |\ T=0\big]\\
+\end{aligned}
+$$
 
+|      | Definition                              | Unconfoundedness        |
+| ---- | --------------------------------------- | ----------------------- |
+| ATE  | $\mathbb{E}\big[Y(1)-Y(0)]$             | $\big(Y(0),Y(1)\big)⫫T$ |
+| ATT  | $\mathbb{E}\big[Y(1)-Y(0)\ |\ T=1\big]$ | $Y(0)⫫T$                |
 
+To help understanding, we can treat the above ATT conditioned on $T=1$ as the ATE of the treatment group, i.e., we only care about the outcome of the treatment group. Then $Y(1)$ represents <u>the observed outcome of the treatment group</u>, while $T(0)$ represents <u>the counterfactual</u> which is the potential outcome if all treatment group members went to the control group.
 
+Then the unconfoundedness assumption for ATT can be easily explained: As we only care about the outcome of the treatment group, we don't need to observed the counterfactual of the control group, i.e. $\mathbb{E}\big[Y(1)\ |\ T=0\big]$. So the only assumption we need is $Y(0)⫫T$.
 
+### Introducing Time
 
+**Observed Outcome at Time $\tau$:**
+$$
+Y_\tau
+$$
+**Potential Outcome at Time $\tau$:**
+$$
+Y_\tau(t)
+$$
+**ATT at Time $\tau$:**
+$$
+\mathbb{E}\big[Y_\tau(1)-Y_\tau(0)\ |\ T=1\big]
+$$
+ We can observe all $Y_\tau(1)$ under condition $T=1$, while $Y_\tau(0)$ are counterfactuals.
 
+## 10.2 Identification
 
+### Assumptions with Time Introduced
 
+#### Consistency
 
+$$
+\begin{aligned}
+&T=t\ \Longrightarrow\ Y_\tau=Y_\tau(t),\quad\forall\tau\\
+&\text{i.e.}\quad Y_\tau=Y_\tau(T)
+\end{aligned}
+$$
 
+#### Parallel Trends
 
+$$
+\begin{aligned}
+&\mathbb{E}\big[Y_1(0)-Y_0(0)\ |\ T=1\big]=\mathbb{E}\big[Y_1(0)-Y_0(0)\ |\ T=0\big]\\
+&\text{i.e.}\quad \big(Y_1(0)-Y_0(0)\big)⫫T
+\end{aligned}
+$$
 
+<img src="figs\10.a.png" style="zoom:60%;" />
 
+#### No Pretreatment Effect
 
+$$
+\mathbb{E}\big[Y_0(1)-Y_0(0)\ |\ T=1\big]=0
+$$
 
 
 
@@ -1137,6 +1350,7 @@ Check the textbook.
 
 
 
+### Difference-in-differences Identification
 
 
 
@@ -1148,31 +1362,7 @@ Check the textbook.
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Major Problems
 
 
 
