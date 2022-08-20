@@ -1338,43 +1338,68 @@ $$
 
 <img src="figs\10.a.png" style="zoom:60%;" />
 
+With time introduced, the independency changes to $\big(Y_1(0)-Y_0(0)\big)⫫T$ compared with ATT's $Y(0)⫫T$.
+
 #### No Pretreatment Effect
 
 $$
-\mathbb{E}\big[Y_0(1)-Y_0(0)\ |\ T=1\big]=0
+\mathbb{E}\big[Y_0(1)\ |\ T=1\big]=\mathbb{E}\big[Y_0(0)\ |\ T=1\big]
+$$
+
+This assumes that the observation and counterfactual are the same for treatment group at start time.
+
+### Difference-in-differences Identification
+
+Given consistency, parallel trends, and no pretreatment effect, we have the following:
+
+$$
+\mathbb{E}\big[Y_1(1)-Y_1(0)\ |\ T=1\big]=\Big(\mathbb{E}\big[Y_1\ |\ T=1\big]-\mathbb{E}\big[Y_0\ |\ T=1\big]\Big)-\Big(\mathbb{E}\big[Y_1\ |\ T=0\big]-\mathbb{E}\big[Y_0\ |\ T=0\big]\Big)
+$$
+<img src="figs\10.b.png" style="zoom:60%;" />
+
+Proof:
+$$
+\begin{aligned}
+\mathbb{E}\big[Y_1(1)-Y_1(0)\ |\ T=1\big]&=\mathbb{E}\big[Y_1(1)\ |\ T=1\big]-\mathbb{E}\big[Y_1(0)\ |\ T=1\big]\\
+&=\mathbb{E}\big[Y_1\ |\ T=1\big]-\mathbb{E}\big[Y_1(0)\ |\ T=1\big]\quad\text{(Consistency)}\\
+&=\mathbb{E}\big[Y_1\ |\ T=1\big]-\Big(\mathbb{E}\big[Y_0(0)\ |\ T=1\big]+\mathbb{E}\big[Y_1(0)\ |\ T=0\big]-\mathbb{E}\big[Y_0(0)\ |\ T=0\big]\Big)\quad\text{(Parallel Trends)}\\
+&=\mathbb{E}\big[Y_1\ |\ T=1\big]-\mathbb{E}\big[Y_0(0)\ |\ T=1\big]-\mathbb{E}\big[Y_1\ |\ T=0\big]+\mathbb{E}\big[Y_0\ |\ T=0\big]\\
+&=\mathbb{E}\big[Y_1\ |\ T=1\big]-\mathbb{E}\big[Y_0(1)\ |\ T=1\big]-\mathbb{E}\big[Y_1\ |\ T=0\big]+\mathbb{E}\big[Y_0\ |\ T=0\big]\quad\text{(No Pretreatment Effect)}\\
+&=\Big(\mathbb{E}\big[Y_1\ |\ T=1\big]-\mathbb{E}\big[Y_0\ |\ T=1\big]\Big)-\Big(\mathbb{E}\big[Y_1\ |\ T=0\big]-\mathbb{E}\big[Y_0\ |\ T=0\big]\Big)
+\end{aligned}
+$$
+
+## 10.3 Major Problems
+
+The problem focuses on the parallel trends assumption.
+
+### Violations of Time
+
+Sometimes, we need to condition on $W$ to satisfy the parallel trends assumption:
+$$
+\begin{aligned}
+&\mathbb{E}\big[Y_1(0)-Y_0(0)\ |\ T=1,W\big]=\mathbb{E}\big[Y_1(0)-Y_0(0)\ |\ T=0,W\big]\\
+&\text{i.e.}\quad \big(Y_1(0)-Y_0(0)\big)⫫T,W
+\end{aligned}
+$$
+However, if $Y$ is related to time $\tau$ and treatment $T$ together in a single term, then it is invalid by conditioning on $W$:
+$$
+Y:=\cdots+\tau T\quad\Longrightarrow\quad\text{Parallel Trends Violation}
+$$
+
+### Scale-Specific Problem
+
+The parallel trends assumptions isn’t nonparametric, as it doesn't support non-linear transformation:
+$$
+\mathbb{E}\big[Y_1(0)-Y_0(0)\ |\ T=1\big]=\mathbb{E}\big[Y_1(0)-Y_0(0)\ |\ T=0\big]\\
+\text{Does not imply}\\
+\mathbb{E}\big[\log Y_1(0)-\log Y_0(0)\ |\ T=1\big]=\mathbb{E}\big[\log Y_1(0)-\log Y_0(0)\ |\ T=0\big]
 $$
 
 
 
 
-
-
-
-### Difference-in-differences Identification
-
-
-
-
-
-
-
-
-
-
-
-Major Problems
-
-
-
-
-
-
-
-
-
-
-
-
+# 11 Causal Discovery from Observational Data
 
 
 
