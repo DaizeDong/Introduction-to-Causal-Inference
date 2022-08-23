@@ -1,6 +1,11 @@
 # Introduction to Causal Inference
 
-This is a brief note on [Brady Neal](https://www.bradyneal.com/aboutme)'s online causal inference course. The Content is mainly arranged by the course textbook. Some sections are slightly modified according to personal comprehension to help understanding. *Last update on August 19th, 2022.*
+This is a brief note on [Brady Neal](https://www.bradyneal.com/aboutme)'s online causal inference course. The Content is mainly arranged by the course textbook. Some sections are slightly modified according to personal comprehension to help understanding. *Last update on August 21th, 2022.*
+
+This course covers both SCM and RCM in causal inference:
+
+1. SCM: Mainly about Structural Causal Model (SCM) framework.
+2. RCM: Mainly about Rubin Causal Model (RCM), a.k.a, Potential Outcome framework (PO).
 
 **Course Website：** [Introduction to Causal Inference (bradyneal.com)](https://www.bradyneal.com/causal-inference-course)
 
@@ -175,7 +180,7 @@ $$
 \\
 \tau&=\mathbb{E}_X\mathbb{E}\big[Y(1)-Y(0)|X\big]\\
 &=\mathbb{E}_X\Big[\mathbb{E}\big[Y(1)|X\big]-\mathbb{E}\big[Y(0)|X\big]\Big]\\
-&=\mathbb{E}_X\Big[\mathbb{E}\big[Y(1)|T=1,X\big]-\mathbb{E}\big[Y(0)|T=0,X\big]\Big]\quad\text{(Conditional Exchangeability \& Positivity)}\\
+&=\mathbb{E}_X\Big[\mathbb{E}\big[Y(1)|T=1,X\big]-\mathbb{E}\big[Y(0)|T=0,X\big]\Big]\quad\text{(Unconfoundedness \& Positivity)}\\
 &=\mathbb{E}_X\Big[\mathbb{E}\big[Y|T=1,X\big]-\mathbb{E}\big[Y|T=0,X\big]\Big]\quad\text{(Consistency)}
 \end{aligned}
 $$
@@ -203,6 +208,8 @@ A combination of consistency and no interference.
 ## 2.5 Example
 
 Check the textbook for details.
+
+
 
 
 
@@ -273,9 +280,9 @@ We will study the association from three basic blocks in Bayesian networks.
 
 **(Global) Markov Assumption:**
 
-- Given: $P$ is Markov with respect to $G$. <!--P is a Markov Process-->
+- Given: $P$ is <u>Markov distribution</u> with respect to $G$.
 
-  If $X,Y$ are d-separated in $G$ conditioned on $Z$, then $X,Y$ are independent in $P$ conditioned on $Z$.
+  If $X,Y$ are d-separated by $Z$ in graph $G$, then $X,Y$ are independent in the distribution $P$ conditioned on $Z$.
   $$
   X⫫_GY\ |\ Z\Longrightarrow X⫫_PY\ |\ Z
   $$
@@ -330,6 +337,8 @@ $$
 $$
 P(x_i\ |\ \text{pa}_i)
 $$
+
+where $\text{pa}_i$ denotes the parents of $x_i$.
 
 **Sufficient Adjustment Set:** $W$ is a sufficient adjustment set if is satisfies:
 $$
@@ -1399,8 +1408,149 @@ $$
 
 
 
+
 # 11 Causal Discovery from Observational Data
 
+> ***Construct causality from observational data.***
+
+## 11.1 Independence-Based Causal Discovery
+
+### Preliminaries
+
+**Markov Assumption:** <!--copy from chapter 3-->
+
+- If $X,Y$ are d-separated by $Z$ in graph $G$, then $X,Y$ are independent in the distribution $P$ conditioned on $Z$.
+
+$$
+X⫫_GY\ |\ Z\Longrightarrow X⫫_PY\ |\ Z
+$$
+
+**Faithfulness Assumption:**
+
+- If $X,Y$ are independent in distribution $P$ conditioned on $Z$, then $X,Y$ are d-separated by $Z$ in graph $G$.
+
+$$
+X⫫_GY\ |\ Z\Longleftarrow X⫫_PY\ |\ Z
+$$
+
+This is the converse of the Markov assumption. It is a strong assumption and is hard to satisfy.
+
+In reality, what we can observe is usually the distribution $P$. With Faithfulness satisfied, we can reconstruct $G$ with no bias.
+
+**Causal Sufficiency Assumption:**
+
+- There are no unobserved confounders of any of the variables in the graph.
+
+### Markov Equivalence
+
+Under the Markov, faithfulness, causal sufficiency, and acyclicity assumptions, we can partially identify the causal graph.
+
+#### Fundamental Concepts
+
+**Markov Equivalent:** Two graphs are Markov equivalent if they correspond to the same set of conditional independencies.
+
+<img src="figs\11.2.png" style="zoom:60%;" />
+
+The conditional independences $X_1⫫X_3\ |\ X_2$ are all the same in the above 3 graphs. So we can't specify the structure of corresponding causal graph $G$ with given distribution $P$. 
+
+**Skeleton:** The structure we get if we replace all of the directed edges with undirected edges for a graph.
+
+<img src="figs\11.4.png" style="zoom:55%;" />
+
+**Markov Equivalence Class:** The set of graphs that encode the same conditional independencies.
+
+<img src="figs\11.3.png" style="zoom:46%;" />
+
+Sharing the same skeleton doesn't imply the same Markov equivalence class. Compared to the three graphs above, the immorality is in its own Markov equivalence class.
+
+#### Markov Equivalence via Immoral Skeletons
+
+Two graphs are Markov equivalent if and only if they have the same <u>skeleton</u> and same <u>immoralities</u>.
+
+#### Markov Completeness
+
+If we have multinomial distributions or linear Gaussian structural equations, we can only identify a graph up to its <u>Markov equivalence class</u>.
+
+#### The PC Algorithm
+
+Starting with a complete graph, the PC algorithm continually trims down edges and orients the left ones.
+
+1. Identify the skeleton.
+2. Identify immoralities and orient them.
+3. Orient qualifying edges that are incident on colliders.
+
+<img src="figs\11.a.png" style="zoom:60%;" />
+
+## 11.2 Semi-Parametric Causal Discovery
+
+### Preliminaries
+
+**Non-Identifiability of Two-Node Graphs:**
+
+- For every joint distribution $P(x,y)$ on two real-valued random variables, there is an SCM in either direction that generates data consistent with $P(x,y)$.
+
+$$
+P(x,y)\quad\Longrightarrow\quad
+\begin{cases}
+Y=f_Y(X,U_Y),\quad X⫫U_Y\\
+X=f_X(Y,U_X),\quad Y⫫U_X
+\end{cases}
+$$
+
+To distinguish the causal relationship between two nodes, we have to make some assumptions about the functional form. But it is not necessary to assume the entire function, i.e., we make <u>semi-parametric assumptions</u>.
+
+### Linear Non-Gaussian Noise
+
+#### Fundamental Concepts
+
+We can identify the direction of causal flow between $X$ and $Y$ if its structural equation follows:
+$$
+Y:=f(X)+U,\quad X⫫U
+$$
+where $f$ is a linear function, and $U$ is distributed as a non-Gaussian random variable.
+
+#### Identifiability in Linear Non-Gaussian Setting
+
+In the linear non-Gaussian setting with $P(x,y)$ given, if the true SCM is:
+$$
+Y:=f(X)+U,\quad X⫫U
+$$
+then there doesn't exist an SCM in the reverse direction:
+$$
+X:=f(Y)+\tilde{U},\quad X⫫\tilde{U}
+$$
+
+### Nonlinear Models
+
+#### Nonlinear Additive Noise Setting
+
+We can also get the identifiability of the causal graph when:
+$$
+X_i:=f(\text{pa}_i)+U_i,\quad \forall i
+$$
+where $f$ is a non-linear function, $\text{pa}$ is the parents of $X$, and $U$ is noise.
+
+#### Post-Nonlinear Setting
+
+We can also add another non-linear function:
+$$
+X_i:=g\big(f(\text{pa}_i)+U_i\big),\quad \forall i
+$$
+where $f,g$ are non-linear functions, $\text{pa}$ is the parents of $X$, and $U$ is noise.
+
+## 11.3 Further Resources
+
+Check the following materials for the frontier of causal discovery research.
+
+ [(2017) Introduction to the foundations of causal discovery.pdf](materials\causality in observational data\(2017) Introduction to the foundations of causal discovery.pdf) 
+
+ [(2019) Review of Causal Discovery Methods Based on Graphical Models.pdf](materials\causality in observational data\(2019) Review of Causal Discovery Methods Based on Graphical Models.pdf) 
+
+
+
+
+
+# 12 Causal Discovery from Interventional Data
 
 
 
@@ -1408,6 +1558,7 @@ $$
 
 
 
+# 13 Transfer Learning and Transportability
 
 
 
@@ -1415,27 +1566,5 @@ $$
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# 14 Counterfactuals and Mediation
 
