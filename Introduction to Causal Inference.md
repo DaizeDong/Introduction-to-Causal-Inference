@@ -1,6 +1,6 @@
 # Introduction to Causal Inference
 
-This is a brief note on [Brady Neal](https://www.bradyneal.com/aboutme)'s online causal inference course. The Content is mainly arranged by the course textbook. Some sections are slightly modified according to personal comprehension to help understanding. *Last update on August 21th, 2022.*
+This is a brief note on [Brady Neal](https://www.bradyneal.com/aboutme)'s online causal inference course. The Content is mainly arranged by the course textbook. Some sections are slightly modified according to personal comprehension to help understanding. *Last update on August 24th, 2022.*
 
 This course covers both SCM and RCM in causal inference:
 
@@ -1411,7 +1411,7 @@ $$
 
 # 11 Causal Discovery from Observational Data
 
-> ***Construct causality from observational data.***
+> ***Construct causality from observations.***
 
 ## 11.1 Independence-Based Causal Discovery
 
@@ -1470,6 +1470,8 @@ Two graphs are Markov equivalent if and only if they have the same <u>skeleton</
 #### Markov Completeness
 
 If we have multinomial distributions or linear Gaussian structural equations, we can only identify a graph up to its <u>Markov equivalence class</u>.
+
+[(1990) Equivalence and Synthesis of Causal Models.pdf](materials\causality in observational data\(1990) Equivalence and Synthesis of Causal Models.pdf) 
 
 #### The PC Algorithm
 
@@ -1542,9 +1544,9 @@ where $f,g$ are non-linear functions, $\text{pa}$ is the parents of $X$, and $U$
 
 Check the following materials for the frontier of causal discovery research.
 
- [(2017) Introduction to the foundations of causal discovery.pdf](materials\causality in observational data\(2017) Introduction to the foundations of causal discovery.pdf) 
+[(2017) Introduction to the foundations of causal discovery.pdf](materials\causality in observational data\(2017) Introduction to the foundations of causal discovery.pdf) 
 
- [(2019) Review of Causal Discovery Methods Based on Graphical Models.pdf](materials\causality in observational data\(2019) Review of Causal Discovery Methods Based on Graphical Models.pdf) 
+[(2019) Review of Causal Discovery Methods Based on Graphical Models.pdf](materials\causality in observational data\(2019) Review of Causal Discovery Methods Based on Graphical Models.pdf) 
 
 
 
@@ -1552,13 +1554,127 @@ Check the following materials for the frontier of causal discovery research.
 
 # 12 Causal Discovery from Interventional Data
 
+> ***Construct causality from interventions.***
 
+<u>***Note:** The content of this chapter is missing in the textbook. It's better to directly check the slide for details.*</u>
+
+## 12.1 Structural Interventions
+
+### Fundamental Concepts
+
+**Structural Interventions:**
+$$
+\begin{aligned}
+Y&:=f_\theta(A,B,C,N_Y)\\
+\Longrightarrow Y&:=N'_Y
+\end{aligned}
+$$
+<img src="figs\12.a.png" style="zoom:70%;" />
+
+### Interventional Markov Equivalence
+
+The Markov equivalence is the same as that in chapter 11.
+
+#### Single-Node
+
+**Conclusion:**
+
+- $n – 1$ single-node interventions are sufficient and necessary to distinguish the causal effect between each pair of nodes in the worst case (complete graph), with <u>**no** empty edges</u> included.
+- $n$ single-node interventions are sufficient and necessary to distinguish the causal effect between each pair of nodes in the worst case (complete graph), with <u>empty edges</u> included.
+
+[(2006) N-1 Experiments Suffice to Determine the Causal Relations Among N Variables.pdf](materials\causality in interventional data\(2006) N-1 Experiments Suffice to Determine the Causal Relations Among N Variables.pdf) 
+
+#### Multi-Node
+
+**Conclusion:**
+
+- $\lfloor \log_2n \rfloor+1$ single-node interventions are sufficient and necessary to distinguish the causal effect between each pair of nodes in the worst case (complete graph), with <u>**no** empty edges</u> included.
+
+[(2005) On the Number of Experiments Sufficient and in the Worst Case Necessary to Identify All Causal Relations Among N Variables.pdf](materials\causality in interventional data\(2005) On the Number of Experiments Sufficient and in the Worst Case Necessary to Identify All Causal Relations Among N Variables.pdf) 
+
+- $\lfloor \log_2c \rfloor+1$ single-node interventions are sufficient and necessary to distinguish the causal effect between each pair of nodes in the worst case (<u>non-complete graph</u>), with <u>**no** empty edges</u> included,
+
+  where $c$ is the the size of the largest clique.
+
+[(2008) Almost Optimal Intervention Sets for Causal Discovery.pdf](materials\causality in interventional data\(2008) Almost Optimal Intervention Sets for Causal Discovery.pdf) 
+
+[(2014) Two Optimal Strategies for Active Learning of Causal Models from Interventional Data.pdf](materials\causality in interventional data\(2014) Two Optimal Strategies for Active Learning of Causal Models from Interventional Data.pdf) 
+
+## 12.2 Parametric Interventions
+
+### Fundamental Concepts
+
+**Parametric Interventions:**
+$$
+\begin{aligned}
+Y&:=f_\theta(A,B,C,N_Y)\\
+\Longrightarrow Y&:=f_{\theta'}(A,B,C,N_Y)
+\end{aligned}
+$$
+<img src="figs\12.b.png" style="zoom:70%;" />
+
+### Interventional Markov Equivalence
+
+#### Single-Node
+
+**Theorem:**
+
+- Two graphs augmented with single-node interventions are interventionally Markov equivalent <u>if and only if</u> they have the same skeletons and immoralities.
+
+[(2001) Causal Discovery from Changes.pdf](materials\causality in interventional data\(2001) Causal Discovery from Changes.pdf) 
+
+**Conclusion:**
+
+- $n – 1$ single-node interventions are sufficient and necessary to distinguish the causal effect between each pair of nodes in the worst case (complete graph), with <u>**no** empty edges</u> included.
+
+[(2007) Interventions and Causal Inference.pdf](materials\causality in interventional data\(2007) Interventions and Causal Inference.pdf) 
+
+#### Multi-Node
+
+**Theorem:**
+
+- Given the observational data, two graphs augmented with multi-node interventions are interventionally Markov equivalent <u>if and only if</u> they have the same skeletons and immoralities.
+
+[(2018) Characterizing and Learning Equivalence Classes of Causal DAGs under Interventions.pdf](materials\causality in interventional data\(2018) Characterizing and Learning Equivalence Classes of Causal DAGs under Interventions.pdf) 
+
+**Conclusion:**
+
+[(2012) Characterization and Greedy Learning of Interventional Markov Equivalence Classes of Directed Acyclic Graphs.pdf](materials\causality in interventional data\(2012) Characterization and Greedy Learning of Interventional Markov Equivalence Classes of Directed Acyclic Graphs.pdf) 
+
+## 12.3 Miscellaneous Other Settings
+
+Check the slide.
 
 
 
 
 
 # 13 Transfer Learning and Transportability
+
+> 
+>
+
+<u>***Note:** The content of this chapter is missing in the textbook. It's better to directly check the slide for details.*</u>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1567,4 +1683,33 @@ Check the following materials for the frontier of causal discovery research.
 
 
 # 14 Counterfactuals and Mediation
+
+> 
+>
+
+<u>***Note:** The content of this chapter is missing in the textbook. It's better to directly check the slide for details.*</u>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
