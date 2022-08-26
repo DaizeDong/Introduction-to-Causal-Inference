@@ -4,9 +4,9 @@
 
 ### Repository
 
-Notes and slides on Brady Neal's online Causal Inference course in English. Contents are still in update.
+Notes and slides on Brady Neal's online Causal Inference course in English.
 
-因果推理入门课程(by Brady Neal)的英文笔记，分享以供交流，内容会随笔者进度而更新。
+因果推理入门课程(by Brady Neal)的英文笔记，分享以供交流，已完结。
 
 ### Course
 
@@ -23,6 +23,6 @@ This course covers both SCM and RCM in causal inference:
 
 ## Progress
 
-Chapter 12 finished.
+All chapters finished.
 
-**Last Update:** August 24th, 2022.
+**Last Update:** August 26th, 2022.
