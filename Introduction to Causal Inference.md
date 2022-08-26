@@ -1,6 +1,6 @@
 # Introduction to Causal Inference
 
-This is a brief note on [Brady Neal](https://www.bradyneal.com/aboutme)'s online causal inference course. The Content is mainly arranged by the course textbook. Some sections are slightly modified according to personal comprehension to help understanding. *Last update on August 24th, 2022.*
+This is a brief note on [Brady Neal](https://www.bradyneal.com/aboutme)'s online causal inference course. The Content is mainly arranged by the course textbook. Some sections are slightly modified according to personal comprehension to help understanding. *Last update on August 26th, 2022.*
 
 This course covers both SCM and RCM in causal inference:
 
@@ -1651,32 +1651,39 @@ Check the slide.
 
 # 13 Transfer Learning and Transportability
 
-> 
->
+> ***Causal inference in transfer learning.***
 
 <u>***Note:** The content of this chapter is missing in the textbook. It's better to directly check the slide for details.*</u>
 
+## 13.1 What is Transfer Learning
 
+Pass...
 
+## 13.2 Causal Inference in Transfer Learning
 
+[(2018) Invariant Models for Causal Transfer Learning.pdf](materials\transfer learning\(2018) Invariant Models for Causal Transfer Learning.pdf) 
 
+### Direct Transportability
 
+Identifying $P^*\big(y\ |\ \text{do}(t),x\big)$.
 
+$S$ can be blocked by $T,X$.
 
+No extra operation needed to help transferring.
 
+### Trivial Transportability
 
+Identifying $P^*\big(y\ |\ \text{do}(t),x\big)$.
 
+$S$ directly cause $Y$.
 
+Can identify causation using only target data.
 
+### S-Admissibility
 
+Identifying $P^*\big(y\ |\ \text{do}(t)\big)$.
 
-
-
-
-
-
-
-
+$S$ can be blocked by $W$. 
 
 
 
@@ -1684,32 +1691,14 @@ Check the slide.
 
 # 14 Counterfactuals and Mediation
 
-> 
->
+> ***Quantifying counterfactuals.***
 
 <u>***Note:** The content of this chapter is missing in the textbook. It's better to directly check the slide for details.*</u>
 
+## 14.1 Parametric Model
 
+Compute $U$ with a parametric model, and then compute the counterfactual.
 
+## 14.2 Mediation
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Specify causal effects on the mediation nodes.
